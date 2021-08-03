@@ -32,8 +32,8 @@ dataInit:
     cmp r3, r1
     bcc dataLoop
     
-    ldr r1, sbss
-    ldr r2, ebss
+    ldr r1, =sbss
+    ldr r2, =ebss
     b bssInit
 bssLoop:
     mov r0, #0
@@ -61,8 +61,8 @@ Loop:
 
 g_pfnVectors:
 
-  .word _estack
-  .word Reset_Handler
+  .word estack
+  .word ResetHandler
   .word NMI_Handler
   .word HardFault_Handler
   .word MemManage_Handler

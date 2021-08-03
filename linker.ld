@@ -1,6 +1,6 @@
 ENTRY(ResetHandler)
 
-_estack = 0x20017FFF;
+estack = 0x20017FFF;
 minHeapSize = 0x400;
 minStackSize = 0x400;
 
@@ -103,8 +103,8 @@ SECTIONS{
         . = ALIGN(8);
         PROVIDE ( end = . );
         PROVIDE ( _end = . );
-        . = . + _Min_Heap_Size;
-        . = . + _Min_Stack_Size;
+        . = . + minHeapSize;
+        . = . + minStackSize;
         . = ALIGN(8);
       } >RAM
 
