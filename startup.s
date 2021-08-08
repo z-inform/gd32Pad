@@ -48,6 +48,7 @@ bssInit:
 .size ResetHandler, .-ResetHandler
 
     .section .text.Default_Handler, "ax", %progbits
+    .weak Default_Handler
 Default_Handler:
 Loop:
     b Loop
