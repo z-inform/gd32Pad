@@ -1,0 +1,5 @@
+Makefile
+linker.ld
+main.c
+output/output.elf
+startup.s
