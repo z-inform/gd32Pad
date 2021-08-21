@@ -1,7 +1,10 @@
-LIBHEADERS = -IFirmware/CMSIS -IFirmware/CMSIS/GD/GD32F10x/Include -IFirmware/GD32F10x_standard_peripheral/Include -IFirmware/
+LIBHEADERS = -I./Firmware/CMSIS -I./Firmware/CMSIS/GD/GD32F10x/Include -I./Firmware/GD32F10x_standard_peripheral/Include \
+-I./Firmware/
+LIBSRC = -I./Firmware/GD32F10x_standard_peripheral/Source
 DEFINES = -DGD32F10X_XD
-CFLAGS = -Og -mcpu=cortex-m3 -mthumb -Wall -g -Wa,-a,-ad $(LIBHEADERS) $(DEFINES)
-LINKERFLAGS = -fdata-sections -ffunction-sections -lc -lm -lnosys -specs=nano.specs -Wl,-Map=$(BUILDDIR)/output.map,--cref -Wl,--gc-sections
+CFLAGS = -Og -mcpu=cortex-m3 -mthumb -Wall -g -Wa,-a,-ad $(LIBHEADERS) $(LIBSRC) $(DEFINES)
+LINKERFLAGS = -fdata-sections -ffunction-sections -lc -lm -lnosys -specs=nano.specs -Wl,-Map=$(BUILDDIR)/output.map,--cref \
+-Wl,--gc-sections
 PREF = arm-none-eabi-
 BUILDDIR = output
 
