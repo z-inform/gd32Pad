@@ -3,7 +3,7 @@
 .fpu softvfp
 .thumb
 
-.global vectors
+.global .g_pfnVectors
 .global Default_Handler
 
 .word sidata
@@ -11,6 +11,7 @@
 .word edata
 .word sbss
 .word ebss
+
 
     .section .text.ResetHandler
     .weak ResetHandler
@@ -40,7 +41,7 @@ bssLoop:
     str r0, [r1], #4
 bssInit:
     cmp r1, r2
-    bcc sbss
+    bcc bssLoop
 
     bl __libc_init_array
     bl main

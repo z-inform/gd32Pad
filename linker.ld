@@ -1,13 +1,13 @@
 ENTRY(ResetHandler)
 
-estack = 0x20017FFF;
+estack = 0x20018000;
 minHeapSize = 0x400;
 minStackSize = 0x400;
 
 
 MEMORY{
     RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 96K
-    FLASH (RX) : ORIGIN = 0X08000000, LENGTH = 1M
+    FLASH (RX) : ORIGIN = 0X08000000, LENGTH = 1024K
 }
 
 SECTIONS{
