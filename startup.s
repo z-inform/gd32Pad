@@ -52,6 +52,9 @@ bssInit:
     .weak Default_Handler
 Default_Handler:
 Loop:
+    MRS r0, IPSR
+    ldr r1, =interrupt
+    str r0, [r1]
     b Loop
 .size Default_Handler, .-Default_Handler
 
