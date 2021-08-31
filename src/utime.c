@@ -13,7 +13,7 @@ void blink_timer_uinit(int delay){
     blink_timer.prescaler = (rcu_clock_freq_get(CK_APB1) / 1000) - 1;
     blink_timer.alignedmode = TIMER_COUNTER_EDGE;
     blink_timer.counterdirection = TIMER_COUNTER_DOWN;
-    blink_timer.period = delay;
+    blink_timer.period = 2 * delay - 1;
     blink_timer.clockdivision = TIMER_CKDIV_DIV1;
     timer_init(TIMER2, &blink_timer);
     timer_interrupt_flag_clear(TIMER2, TIMER_INT_UP);
@@ -31,7 +31,7 @@ void clock_uinit(){
     rcu_osci_on(RCU_PLL_CK);
     rcu_osci_stab_wait(RCU_PLL_CK);
     rcu_apb1_clock_config(RCU_APB1_CKAHB_DIV2);
-    rcu_apb2_clock_config(RCU_APB1_CKAHB_DIV1);
+    rcu_apb2_clock_config(RCU_APB2_CKAHB_DIV1);
     rcu_ahb_clock_config(RCU_AHB_CKSYS_DIV1);
     rcu_adc_clock_config(RCU_CKADC_CKAPB2_DIV8);
     rcu_system_clock_source_config(RCU_CKSYSSRC_PLL);
@@ -41,7 +41,7 @@ void clock_uinit(){
     rcu_periph_clock_enable(RCU_GPIOC);
 }
 
-void TIM3_IRQHandler(){
+void TIMER2_ISR(){
     gpio_bit_write(GPIOC, GPIO_PIN_10, !gpio_output_bit_get(GPIOC, GPIO_PIN_10));
     timer_interrupt_flag_clear(TIMER2, TIMER_INT_FLAG_UP);
 }
