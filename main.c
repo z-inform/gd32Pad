@@ -1,8 +1,4 @@
 #include "gd32f10x_libopt.h"
-#include "gd32f10x_rcu.c"
-#include "gd32f10x_gpio.c"
-#include "gd32f10x_misc.c"
-#include "gd32f10x_timer.c"
 
 #include "include/utime.h"
 #include "include/ubutton.h"
@@ -19,7 +15,7 @@ int main(void){
     gpio_uinit();
     gpio_init(GPIOC, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_10);
     gpio_bit_set(GPIOC, GPIO_PIN_10);
-    blink_timer_uinit(500);
+    blink_timer_uinit(1000);
 
     while(1){
         /*
