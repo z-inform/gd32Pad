@@ -9,26 +9,26 @@ COMPILER = gcc
 BUILDDIR = output
 SRCDIR = src
 INCLDIR = include
-LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o
 
-FINALOBJ := main.o startup.o utime.o ubutton.o $(LIBTARGETS)
+LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o gd32f10x_adc.o gd32f10x_dma.o
+
+ULIBTARGETS = utime.o ubutton.o uadc.o
+
+FINALOBJ := main.o startup.o $(ULIBTARGETS) $(LIBTARGETS)
 FINALOBJ := $(addprefix $(BUILDDIR)/, $(FINALOBJ))
 
 
 $(BUILDDIR)/output.elf : $(FINALOBJ) linker.ld
 	$(PREF)$(COMPILER) $(CFLAGS) $(LINKERFLAGS) $(FINALOBJ) -T linker.ld -o output/output.elf
 
-$(BUILDDIR)/main.o : main.c
+$(BUILDDIR)/main.o : main.c $(INCLDIR)/$(addsuffix .h, $(basename $(ULIBATRGETS)))
 	$(PREF)$(COMPILER) -c $(CFLAGS) main.c -o $(BUILDDIR)/main.o
 
 $(BUILDDIR)/startup.o : startup.s
 	$(PREF)$(COMPILER) -c $(CFLAGS) startup.s -o $(BUILDDIR)/startup.o
 
-$(BUILDDIR)/utime.o : $(SRCDIR)/utime.c $(INCLDIR)/utime.h
-	$(PREF)$(COMPILER) -c $(CFLAGS) $(SRCDIR)/utime.c -o $(BUILDDIR)/utime.o
-
-$(BUILDDIR)/ubutton.o : $(SRCDIR)/ubutton.c $(INCLDIR)/ubutton.h $(BUILDDIR)/utime.o
-	$(PREF)$(COMPILER) -c $(CFLAGS) $(SRCDIR)/ubutton.c -o $(BUILDDIR)/ubutton.o
+$(addprefix $(BUILDDIR)/, $(ULIBTARGETS)) : $(BUILDDIR)/%.o : $(SRCDIR)/%.c $(INCLDIR)/%.h
+	$(PREF)$(COMPILER) -c $(CFLAGS) $< -o $@
 
 $(addprefix $(BUILDDIR)/, $(LIBTARGETS)) : $(BUILDDIR)/%.o : $(LIB)/Source/%.c $(LIB)/Include/%.h
 	$(PREF)$(COMPILER) -c $(CFLAGS) $< -o $@
