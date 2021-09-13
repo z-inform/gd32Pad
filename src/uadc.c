@@ -7,10 +7,10 @@ extern uint32_t sys_tick;
 
 
 void adc_uinit(){
-    //LX - PA1
-    //LY - PA2
-    //RY - PA3
-    //RX - PA4
+    //LX - PA1  increase direction - right
+    //LY - PA2  increase direction - up
+    //RY - PA3  increase direction - down
+    //RX - PA4  increase direction - left
     //BAT Voltage - PA5
 
     gpio_init(GPIOA, GPIO_MODE_AIN, GPIO_OSPEED_50MHZ, GPIO_PIN_1);
@@ -49,7 +49,7 @@ void adc_dma_uinit(uint8_t *dst){
     dma_periph_address_config(DMA0, DMA_CH0, (uint32_t) 0x40012400 + 0x4C); //ADC0 data register
     dma_memory_address_config(DMA0, DMA_CH0, (uint32_t) dst);
     dma_periph_width_config(DMA0, DMA_CH0, DMA_PERIPHERAL_WIDTH_32BIT);
-    dma_memory_width_config(DMA0, DMA_CH0, DMA_MEMORY_WIDTH_8BIT);
+    dma_memory_width_config(DMA0, DMA_CH0, DMA_MEMORY_WIDTH_16BIT);
     dma_memory_increase_enable(DMA0, DMA_CH0);
     dma_periph_increase_disable(DMA0, DMA_CH0);
     dma_memory_to_memory_disable(DMA0, DMA_CH0);
