@@ -40,7 +40,7 @@ void adc_uinit(){
 }
 
 
-void adc_dma_uinit(uint8_t *dst){
+void adc_dma_uinit(uint16_t *dst){
     dma_parameter_struct init;
     dma_struct_para_init(&init);
     dma_channel_disable(DMA0, DMA_CH0);

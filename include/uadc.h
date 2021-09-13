@@ -3,4 +3,4 @@
 #include "stdint.h"
 
 void adc_uinit();
-void adc_dma_uinit(uint8_t* dst);
+void adc_dma_uinit(uint16_t* dst);
