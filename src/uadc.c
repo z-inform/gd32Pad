@@ -4,6 +4,7 @@
 #include "../include/uadc.h"
 #include "../include/utime.h"
 extern uint32_t sys_tick;
+extern volatile char connected_state;
 
 
 void adc_uinit(){
@@ -31,7 +32,7 @@ void adc_uinit(){
     adc_external_trigger_config(ADC0, ADC_REGULAR_CHANNEL, ENABLE);
     adc_data_alignment_config(ADC0, ADC_DATAALIGN_RIGHT);
     adc_interrupt_enable(ADC0, ADC_INT_EOC);
-    nvic_irq_enable(ADC0_1_IRQn, 2, 2);
+    nvic_irq_enable(ADC0_1_IRQn, 3, 3);
     adc_enable(ADC0);
     uint32_t adc_startup = sys_tick;
     while( time_delay(adc_startup, sys_tick) < 10 ) {};
@@ -61,7 +62,9 @@ void adc_dma_uinit(uint16_t *dst){
 
 void ADC0_1_ISR(){
     adc_flag_clear(ADC0, ADC_FLAG_STRC);
-    adc_software_trigger_enable(ADC0, ADC_REGULAR_CHANNEL);
+    if( connected_state ){
+        adc_software_trigger_enable(ADC0, ADC_REGULAR_CHANNEL);
+    }
 }
 
 

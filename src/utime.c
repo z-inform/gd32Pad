@@ -19,7 +19,7 @@ void blink_timer_uinit(int delay){
     timer_interrupt_flag_clear(TIMER2, TIMER_INT_UP);
     timer_interrupt_enable(TIMER2, TIMER_INT_UP);
     timer_enable(TIMER2);
-    nvic_irq_enable(TIMER2_IRQn, 1, 1);
+    nvic_irq_enable(TIMER2_IRQn, 2, 2);
 }
 
 void clock_uinit(){
@@ -41,6 +41,7 @@ void clock_uinit(){
     rcu_periph_clock_enable(RCU_GPIOC);
     rcu_periph_clock_enable(RCU_DMA0);
     rcu_periph_clock_enable(RCU_ADC0);
+    rcu_periph_clock_enable(RCU_USART0);
 }
 
 void TIMER2_ISR(){
@@ -55,5 +56,8 @@ uint32_t time_delay(uint32_t start, uint32_t now){
 
 void SysTick_Handler(){
     sys_tick += 1;
-    timer_interrupt_flag_clear(TIMER2, TIMER_INT_FLAG_UP);
+}
+
+void usleep(uint32_t start, uint32_t delay){
+    while( time_delay(start, sys_tick) < delay ){};
 }
