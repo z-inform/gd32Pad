@@ -6,18 +6,18 @@
 #include "include/ubutton.h"
 #include "include/uadc.h"
 #include "include/uprotocol.h"
+#include "include/circ_buffer.h"
 
 extern uint32_t sys_tick;
-volatile char uart_read[40] = {0};
+extern circ_buffer uart_read;
 volatile char connected_state = 0;
 
 uint32_t interrupt = 0;
 
 int main(void){
-    char* connected_string = "Connected\r\n";
-    char* disconnect_string = "Disconnect\r\n";
-    char* bat_string = "Battery\r\n";
-    char string = 0xA;
+    char* connected_string = "Connected";
+    char* disconnect_string = "Disconnect";
+    char* bat_string = "Battery";
 
 
     struct parcel_struct{
@@ -26,7 +26,6 @@ int main(void){
         uint32_t supp_data;
     } parcel;
     parcel.buttons_status = 0;
-
 
     clock_uinit();
     gpio_uinit();
@@ -42,12 +41,12 @@ int main(void){
     while(1){
         adc_software_trigger_enable(ADC0, ADC_REGULAR_CHANNEL);
 
-        if( strcmp(uart_read, connected_string) == 0 ){
+
+        if( circmp(connected_string, &uart_read) == 0 ){
             connected_state = 1;
             dma_channel_enable(DMA0, DMA_CH0);
             gpio_bit_set(GPIOC, GPIO_PIN_10);
             gpio_bit_set(GPIOB, GPIO_PIN_13);
-            memset((void*) uart_read, 0, sizeof(uart_read));
         }
 
         if( connected_state ){
@@ -55,17 +54,15 @@ int main(void){
 
             get_buttons(&parcel.buttons_status);
 
-            if( strcmp(uart_read, disconnect_string) == 0 ){
+            if( circmp(disconnect_string, &uart_read) == 0 ){
                 connected_state = 0;
                 dma_channel_disable(DMA0, DMA_CH0);
                 gpio_bit_reset(GPIOC, GPIO_PIN_10);
                 //gpio_bit_reset(GPIOB, GPIO_PIN_13); //maybe change to reset pin later (HW not done yet)
                 //gpio_bit_set(GPIOB, GPIO_PIN_13);
-                memset((void*) uart_read, 0, sizeof(uart_read));
             }
 
-            if( strcmp(uart_read, bat_string) == 9 ){
-                memset((void*) uart_read, 0, sizeof(uart_read));
+            if( circmp(bat_string, &uart_read) == 0 ){
                 //battery voltage from ADC
             }
 

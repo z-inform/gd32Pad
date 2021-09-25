@@ -12,7 +12,7 @@ INCLDIR = include
 
 LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o gd32f10x_adc.o gd32f10x_dma.o gd32f10x_usart.o
 
-ULIBTARGETS = utime.o ubutton.o uadc.o uprotocol.o
+ULIBTARGETS = circ_buffer.o utime.o ubutton.o uadc.o uprotocol.o
 
 FINALOBJ := main.o startup.o $(ULIBTARGETS) $(LIBTARGETS)
 FINALOBJ := $(addprefix $(BUILDDIR)/, $(FINALOBJ))

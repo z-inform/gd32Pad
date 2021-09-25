@@ -2,8 +2,9 @@
 #include "gd32f10x_usart.h"
 #include "gd32f10x_dma.h"
 #include "stdint.h"
+#include "../include/circ_buffer.h"
 
-extern char uart_read[40];
+extern circ_buffer uart_read;
 extern char connected_state;
 
 void uart_uinit(){
@@ -26,19 +27,6 @@ void uart_uinit(){
 void uart_dma_uinit(){
     dma_parameter_struct init;
     dma_struct_para_init(&init);
-
-    dma_channel_disable(DMA0, DMA_CH4);
-    dma_init(DMA0, DMA_CH4, &init);
-    dma_periph_address_config(DMA0, DMA_CH4, (uint32_t) 0x40013800 + 0x04); //USART data register
-    dma_memory_address_config(DMA0, DMA_CH4, (uint32_t) uart_read);
-    dma_periph_width_config(DMA0, DMA_CH4, DMA_PERIPHERAL_WIDTH_32BIT);
-    dma_memory_width_config(DMA0, DMA_CH4, DMA_MEMORY_WIDTH_8BIT);
-    dma_memory_increase_enable(DMA0, DMA_CH4);
-    dma_periph_increase_disable(DMA0, DMA_CH4);
-    dma_memory_to_memory_disable(DMA0, DMA_CH4);
-    dma_priority_config(DMA0, DMA_CH4, DMA_PRIORITY_HIGH);
-    dma_transfer_direction_config(DMA0, DMA_CH4, DMA_PERIPHERAL_TO_MEMORY);
-    dma_transfer_number_config(DMA0, DMA_CH4, 40);
 
     dma_channel_disable(DMA0, DMA_CH3);
     dma_init(DMA0, DMA_CH3, &init);
@@ -66,6 +54,10 @@ void uart_com_send(char* str, int length){
 }
 
 void USART0_ISR(){
+    if( usart_flag_get(USART0, USART_FLAG_RBNE) ){
+        circ_write(USART_DATA(USART0), &uart_read);
+        usart_flag_clear(USART0, USART_FLAG_RBNE);
+    }
 }
 
 
