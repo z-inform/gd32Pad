@@ -44,7 +44,9 @@ int circmp(char *str, circ_buffer* buffer){
     if( status == NULL )
         return 1;
     else{
-        *(status) = '\n';
+        //corrupt the string in buffer to avoid finding at again
+        offset = (offset + (unsigned char) status - (unsigned char) unwound_buf) % offset;
+        buffer->buf[offset] = '\n';
         return 0;
     }
 

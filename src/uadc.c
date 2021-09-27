@@ -61,7 +61,7 @@ void adc_dma_uinit(uint16_t *dst){
 }
 
 void ADC0_1_ISR(){
-    adc_flag_clear(ADC0, ADC_FLAG_STRC);
+    adc_flag_clear(ADC0, ADC_FLAG_EOC);
     if( connected_state ){
         adc_software_trigger_enable(ADC0, ADC_REGULAR_CHANNEL);
     }

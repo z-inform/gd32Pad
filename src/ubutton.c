@@ -41,7 +41,6 @@ int update_button(uint32_t* dest, uint32_t* start_timer, char offset, uint32_t p
 void gpio_uinit(){
     //led
     gpio_init(GPIOC, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_10);
-    gpio_bit_set(GPIOC, GPIO_PIN_10);
     //buttons
     //DPAD: PC14, PB5, PB8, PA0
     gpio_init(GPIOC, GPIO_MODE_IPU, GPIO_OSPEED_50MHZ, GPIO_PIN_14);

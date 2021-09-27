@@ -43,14 +43,13 @@ void uart_dma_uinit(){
 }
 
 void uart_com_send(char* str, int length){
-    if( usart_flag_get(USART0, USART_FLAG_TC) ){ //check for ongoing transmission
+    while( !usart_flag_get(USART0, USART_FLAG_TBE) || dma_transfer_number_get(DMA0, DMA_CH3)){} //check for ongoing transmission
         dma_channel_disable(DMA0, DMA_CH3);
         usart_dma_receive_config(USART0, USART_DENT_ENABLE);
         usart_transmit_config(USART0, USART_TRANSMIT_ENABLE);
         dma_memory_address_config(DMA0, DMA_CH3, (uint32_t) str);
         dma_transfer_number_config(DMA0, DMA_CH3, length);
         dma_channel_enable(DMA0, DMA_CH3);
-    }
 }
 
 void USART0_ISR(){

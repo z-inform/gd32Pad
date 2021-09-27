@@ -2,6 +2,9 @@
 #include "gd32f10x_timer.h"
 
 #include "../include/utime.h"
+#include "../include/uprotocol.h"
+
+extern char connected_state;
 
 volatile uint32_t sys_tick = 1;
 
