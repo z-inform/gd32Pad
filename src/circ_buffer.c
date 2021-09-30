@@ -27,17 +27,20 @@ int circmp(char *str, circ_buffer* buffer){
 
     //unwind a circular buffer into C string, splitting buffer on located element
     //translates all '\0' in buffer to '\n' in unwound buffer to make a singular string
+    int unwound_i = 0;
     for(int i = offset; i < CIRC_BUF_SIZE; i++){
         if( buffer->buf[i] == 0 )
-            unwound_buf[i - offset] = '\n';
+            unwound_buf[unwound_i] = '\n';
         else
-            unwound_buf[i - offset] = buffer->buf[i];
+            unwound_buf[unwound_i] = buffer->buf[i];
+        unwound_i++;
     }
     for(int i = 0; i < offset; i++){
         if( buffer->buf[i] == 0 )
-            unwound_buf[i + offset] = '\n';
+            unwound_buf[unwound_i] = '\n';
         else
-            unwound_buf[i + offset] = buffer->buf[i];
+            unwound_buf[unwound_i] = buffer->buf[i];
+        unwound_i++;
     }
 
     status = strstr(unwound_buf, str);
