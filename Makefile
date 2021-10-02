@@ -3,14 +3,14 @@ LIBHEADERS = -I./Firmware/CMSIS -I./Firmware/CMSIS/GD/GD32F10x/Include -I./Firmw
 LIB = ./Firmware/GD32F10x_standard_peripheral
 DEFINES = -DGD32F10X_XD
 CFLAGS = -Og -mcpu=cortex-m3 -mthumb -Wall -g -Wa,-a,-ad $(LIBHEADERS) -I$(LIB) $(DEFINES)
-LINKERFLAGS = -fdata-sections -ffunction-sections -lc -lm -lnosys -specs=nano.specs -Wl,--gc-sections
+LINKERFLAGS = -fdata-sections -ffunction-sections -lc -lm -lnosys -specs=nano.specs -Wl,--gc-sections -specs=nosys.specs
 PREF = arm-none-eabi-
 COMPILER = gcc
 BUILDDIR = output
 SRCDIR = src
 INCLDIR = include
 
-LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o gd32f10x_adc.o gd32f10x_dma.o gd32f10x_usart.o
+LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o gd32f10x_adc.o gd32f10x_dma.o gd32f10x_usart.o gd32f10x_crc.o
 
 ULIBTARGETS = circ_buffer.o utime.o ubutton.o uadc.o uprotocol.o
 

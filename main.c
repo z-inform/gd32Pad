@@ -18,7 +18,7 @@ uint32_t interrupt = 0;
 int main(void){
     char* connected_string = "Connected";
     char* disconnect_string = "Disconnect";
-    char* bat_string = "Batt\n";
+    char* bat_string = "Battery\n";
 
     uint32_t command_timeout = 0;
     char command_mode = 0;
@@ -33,6 +33,7 @@ int main(void){
 
     clock_uinit();
     gpio_uinit();
+    gpio_bit_set(GPIOB, GPIO_PIN_10);
     gpio_bit_reset(GPIOC, GPIO_PIN_10);
     gpio_bit_set(GPIOB, GPIO_PIN_13);
     adc_uinit();
@@ -60,6 +61,10 @@ int main(void){
                 connected_state = 0;
                 blink_timer_uinit(200);
                 dma_channel_disable(DMA0, DMA_CH0);
+                memset(uart_read.buf, 0, CIRC_BUF_SIZE);
+                //also should pull reset of ble
+                gpio_bit_reset(GPIOB, GPIO_PIN_10);
+                //gpio_bit_reset(GPIOB, GPIO_PIN_13);
             }
 
             if( connected_state ){
@@ -80,7 +85,7 @@ int main(void){
 
 
                 //uart_com_send((char*) &parcel, sizeof(parcel) * 4);
-                uart_com_send(bat_string, 5);
+                uart_data_send(bat_string, 8);
 
             }
         }
@@ -88,17 +93,20 @@ int main(void){
         //check for command mode key combination
         if( ((parcel.buttons_status << 20 >> 28) == 0) &&
             (time_delay(command_timeout, sys_tick) > 500) ){
+            get_buttons(&parcel.buttons_status);
             command_timeout = sys_tick;
             command_mode = !command_mode;
         }
 
         //handle command mode keystrokes
         if( command_mode ){
-            if( (parcel.buttons_status << 20 >> 30) == 0 ){
+            if( error_state && (parcel.buttons_status << 20 >> 30) == 0 ){//two lower cbut for error reset
                 error_state = 0;
                 //dma_channel_enable(DMA0, DMA_CH0);
                 gpio_bit_reset(GPIOC, GPIO_PIN_10);
                 timer_disable(TIMER2);
+                gpio_bit_set(GPIOB, GPIO_PIN_10);
+                //gpio_bit_set(GPIOB, GPIO_PIN_13);
             }
         }
 

@@ -54,7 +54,7 @@ void adc_dma_uinit(uint16_t *dst){
     dma_memory_increase_enable(DMA0, DMA_CH0);
     dma_periph_increase_disable(DMA0, DMA_CH0);
     dma_memory_to_memory_disable(DMA0, DMA_CH0);
-    dma_priority_config(DMA0, DMA_CH0, DMA_PRIORITY_HIGH);
+    dma_priority_config(DMA0, DMA_CH0, DMA_PRIORITY_MEDIUM);
     dma_transfer_direction_config(DMA0, DMA_CH0, DMA_PERIPHERAL_TO_MEMORY);
     dma_transfer_number_config(DMA0, DMA_CH0, 4);
     dma_channel_enable(DMA0, DMA_CH0);

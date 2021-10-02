@@ -3,6 +3,9 @@
 #include "gd32f10x_dma.h"
 #include "stdint.h"
 #include "../include/circ_buffer.h"
+#include "string.h"
+#include "gd32f10x_crc.h"
+#include "stdlib.h"
 
 extern circ_buffer uart_read;
 extern char connected_state;
@@ -37,12 +40,12 @@ void uart_dma_uinit(){
     dma_memory_increase_enable(DMA0, DMA_CH3);
     dma_periph_increase_disable(DMA0, DMA_CH3);
     dma_memory_to_memory_disable(DMA0, DMA_CH3);
-    dma_priority_config(DMA0, DMA_CH3, DMA_PRIORITY_HIGH);
+    dma_priority_config(DMA0, DMA_CH3, DMA_PRIORITY_ULTRA_HIGH);
     dma_transfer_direction_config(DMA0, DMA_CH3, DMA_MEMORY_TO_PERIPHERAL);
 
 }
 
-void uart_com_send(char* str, int length){
+void uart_data_send(char* str, int length){
     while( !usart_flag_get(USART0, USART_FLAG_TBE) || dma_transfer_number_get(DMA0, DMA_CH3)){} //check for ongoing transmission
         dma_channel_disable(DMA0, DMA_CH3);
         usart_dma_receive_config(USART0, USART_DENT_ENABLE);
@@ -62,6 +65,35 @@ void USART0_ISR(){
 
 
 
+
+
+
+
+
+void uart_packet_send(char *str, int length, char type){
+    //packet format
+    //2 bytes: 0xBEDD - start of message
+    //2 bytes: data count (bytes)
+    //1 byte: data type (buttons, status...)
+    //... bytes: data
+    //crc32 of data
+
+    crc_data_register_reset();
+    int crc_length = length / 4 + ((length % 4) / 4);
+    uint32_t* crc_buf = calloc(crc_length, 4);
+    memcpy(crc_buf, str, length);
+    crc_block_data_calculate(crc_buf, crc_length);
+    char* buf = (char*) malloc(2 + 2 + 1 + length + 4);
+    buf[0] = 0xBE;
+    buf[1] = 0xDD;
+    memcpy(buf + 2, &length, 2);
+    buf[4] = type;
+    memcpy(buf + 5, str, length);
+    crc_buf[0] = crc_data_register_read();
+    memcpy(buf + 5 + length, crc_buf, 4);
+
+    uart_data_send(buf, 5 + length + 4);
+}
 
 
 
