@@ -12,20 +12,20 @@ INCLDIR = include
 
 LIBTARGETS = gd32f10x_rcu.o gd32f10x_gpio.o gd32f10x_misc.o gd32f10x_timer.o gd32f10x_adc.o gd32f10x_dma.o gd32f10x_usart.o gd32f10x_crc.o
 
-ULIBTARGETS = circ_buffer.o utime.o ubutton.o uadc.o uprotocol.o
+ULIBTARGETS = circ_buffer.o utime.o ubutton.o uadc.o uprotocol.o CRC32.o
 
 FINALOBJ := main.o startup.o $(ULIBTARGETS) $(LIBTARGETS)
 FINALOBJ := $(addprefix $(BUILDDIR)/, $(FINALOBJ))
 
 
 $(BUILDDIR)/output.elf : $(FINALOBJ) linker.ld
-	$(PREF)$(COMPILER) $(CFLAGS) $(LINKERFLAGS) $(FINALOBJ) -T linker.ld -o output/output.elf
+	$(PREF)$(COMPILER) $(CFLAGS) $(LINKERFLAGS) $(FINALOBJ) -T linker.ld -o $@
 
 $(BUILDDIR)/main.o : main.c $(INCLDIR)/$(addsuffix .h, $(basename $(ULIBATRGETS)))
-	$(PREF)$(COMPILER) -c $(CFLAGS) main.c -o $(BUILDDIR)/main.o
+	$(PREF)$(COMPILER) -c $(CFLAGS) main.c -o $@
 
 $(BUILDDIR)/startup.o : startup.s
-	$(PREF)$(COMPILER) -c $(CFLAGS) startup.s -o $(BUILDDIR)/startup.o
+	$(PREF)$(COMPILER) -c $(CFLAGS) startup.s -o $@
 
 $(addprefix $(BUILDDIR)/, $(ULIBTARGETS)) : $(BUILDDIR)/%.o : $(SRCDIR)/%.c $(INCLDIR)/%.h
 	$(PREF)$(COMPILER) -c $(CFLAGS) $< -o $@

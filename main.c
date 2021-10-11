@@ -18,7 +18,7 @@ uint32_t interrupt = 0;
 int main(void){
     char* connected_string = "Connected";
     char* disconnect_string = "Disconnect";
-    char* bat_string = "Battery\n";
+    char* bat_string = "Battery";
 
     uint32_t command_timeout = 0;
     char command_mode = 0;
@@ -62,9 +62,7 @@ int main(void){
                 blink_timer_uinit(200);
                 dma_channel_disable(DMA0, DMA_CH0);
                 memset(uart_read.buf, 0, CIRC_BUF_SIZE);
-                //also should pull reset of ble
                 gpio_bit_reset(GPIOB, GPIO_PIN_10);
-                //gpio_bit_reset(GPIOB, GPIO_PIN_13);
             }
 
             if( connected_state ){
@@ -75,8 +73,9 @@ int main(void){
                     connected_state = 0;
                     dma_channel_disable(DMA0, DMA_CH0);
                     gpio_bit_reset(GPIOC, GPIO_PIN_10);
-                    //gpio_bit_reset(GPIOB, GPIO_PIN_13); //maybe change to reset pin later (HW not done yet)
-                    //gpio_bit_set(GPIOB, GPIO_PIN_13);
+                    gpio_bit_reset(GPIOB, GPIO_PIN_13);
+                    usleep(sys_tick, 500);
+                    gpio_bit_set(GPIOB, GPIO_PIN_13);
                 }
 
                 if( circmp(bat_string, &uart_read) == 0 ){
@@ -84,8 +83,8 @@ int main(void){
                 }
 
 
-                //uart_com_send((char*) &parcel, sizeof(parcel) * 4);
-                uart_data_send(bat_string, 8);
+                uart_packet_send((char*) &parcel, sizeof(parcel), 1);
+                //uart_packet_send(bat_string, 11, 0);
 
             }
         }
@@ -100,7 +99,7 @@ int main(void){
 
         //handle command mode keystrokes
         if( command_mode ){
-            if( error_state && (parcel.buttons_status << 20 >> 30) == 0 ){//two lower cbut for error reset
+            if( error_state && (parcel.buttons_status & (1ul << 3)) == 0 ){//bottom dpad for error reset
                 error_state = 0;
                 //dma_channel_enable(DMA0, DMA_CH0);
                 gpio_bit_reset(GPIOC, GPIO_PIN_10);

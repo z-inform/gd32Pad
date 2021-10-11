@@ -3,6 +3,7 @@
 #include "gd32f10x_dma.h"
 #include "stdint.h"
 #include "../include/circ_buffer.h"
+#include "../include/CRC32.h"
 #include "string.h"
 #include "gd32f10x_crc.h"
 #include "stdlib.h"
@@ -63,38 +64,28 @@ void USART0_ISR(){
 }
 
 
-
-
-
-
-
-
-
 void uart_packet_send(char *str, int length, char type){
     //packet format
-    //2 bytes: 0xBEDD - start of message
+    //2 bytes: 0x3B3D - start of message
     //2 bytes: data count (bytes)
     //1 byte: data type (buttons, status...)
-    //... bytes: data
+    //... bytes: data (always 0 padded to 4 byte alignment)
     //crc32 of data
 
-    crc_data_register_reset();
-    int crc_length = length / 4 + ((length % 4) / 4);
-    uint32_t* crc_buf = calloc(crc_length, 4);
-    memcpy(crc_buf, str, length);
-    crc_block_data_calculate(crc_buf, crc_length);
-    char* buf = (char*) malloc(2 + 2 + 1 + length + 4);
-    buf[0] = 0xBE;
-    buf[1] = 0xDD;
-    memcpy(buf + 2, &length, 2);
-    buf[4] = type;
-    memcpy(buf + 5, str, length);
-    crc_buf[0] = crc_data_register_read();
-    memcpy(buf + 5 + length, crc_buf, 4);
+    int crc_length = length + (4 - (length % 4));
+    uint32_t* crc_buf = calloc(crc_length, 1);
+    memcpy(crc_buf, str, length); //save copy of data to buffer and pad with zeroes to uint32 alingment
+    char* buf = (char*) malloc(5 + crc_length + 4);
+    memcpy(buf + 5, crc_buf, crc_length); //copy padded data to final parcel buffer
+    crc_buf[0] = doCRC32(crc_buf, crc_length);
+    memcpy(buf + 2, &crc_length, 2); //copy padded data length to parcel
+    memcpy(buf + 5 + crc_length, crc_buf, 4); //copy crc32 of data to parcel
 
-    uart_data_send(buf, 5 + length + 4);
+    buf[0] = 0x3B; //set parcel prefix
+    buf[1] = 0x3D;
+    buf[4] = type; //set data type
+
+    uart_data_send(buf, 5 + crc_length + 4);
+    free(crc_buf);
+    free(buf);
 }
-
-
-
-
