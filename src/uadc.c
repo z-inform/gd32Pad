@@ -3,6 +3,7 @@
 #include "gd32f10x_gpio.h"
 #include "../include/uadc.h"
 #include "../include/utime.h"
+#include "../include/uprotocol.h"
 extern uint32_t sys_tick;
 extern volatile char connected_state;
 
@@ -33,6 +34,10 @@ void adc_uinit(){
     adc_data_alignment_config(ADC0, ADC_DATAALIGN_RIGHT);
     adc_interrupt_enable(ADC0, ADC_INT_EOC);
     nvic_irq_enable(ADC0_1_IRQn, 3, 3);
+
+    adc_watchdog_threshold_config(ADC0, 3400, 4096); //3.5v lower threshhold
+    adc_interrupt_enable(ADC0, ADC_INT_WDE);
+    //adc_watchdog_single_channel_enable(ADC0, ADC_CHANNEL_5); dont turn on before the batteries are connected
     adc_enable(ADC0);
     uint32_t adc_startup = sys_tick;
     while( time_delay(adc_startup, sys_tick) < 10 ) {};
@@ -61,13 +66,20 @@ void adc_dma_uinit(uint16_t *dst){
 }
 
 void ADC0_1_ISR(){
+    if( adc_flag_get(ADC0, ADC_FLAG_WDE) ){ //AAA help we dying no battery AAA
+        blink_timer_uinit(150);
+        adc_disable(ADC0);
+        if( connected_state ){
+            //gpio_bit_set(GPIOB, GPIO_PIN_10); //bluetooth reset
+            //gpio_bit_set(GPIOB, GPIO_PIN_13); //uart power on
+            char* err_string = "Low battery";
+            uart_packet_send(err_string, sizeof(err_string), 2);
+        }
+        usleep(sys_tick, 2000);
+        gpio_bit_reset(GPIOB, GPIO_PIN_9);
+    }
     adc_flag_clear(ADC0, ADC_FLAG_EOC);
     if( connected_state ){
         adc_software_trigger_enable(ADC0, ADC_REGULAR_CHANNEL);
     }
 }
-
-
-
-
-
